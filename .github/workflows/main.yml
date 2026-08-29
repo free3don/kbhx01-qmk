@@ -54,6 +54,38 @@ jobs:
             find /workspace -name 'rules.mk' -exec cp {} /tmp/qmk_firmware/keyboards/kbhx01/ \; && \
             find /workspace -name 'keymap.c' -exec cp {} /tmp/qmk_firmware/keyboards/kbhx01/keymaps/via/ \; && \
             cd /tmp/qmk_firmware && \
+            make kbhx01:via && \
+            cp /tmp/qmk_firmware/*.uf2 /workspace/
+          "
+
+      - name: Upload UF2 Firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: kbhx01_via_firmware
+          path: "*.uf2"name: Build KBHX01 Firmware
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Compile QMK in Docker
+        run: |
+          docker run --rm -v $(pwd):/workspace -w /workspace ghcr.io/qmk/qmk_cli:latest /bin/bash -c "
+            git config --global --add safe.directory '*' && \
+            qmk setup -y -H /tmp/qmk_firmware && \
+            mkdir -p /tmp/qmk_firmware/keyboards/kbhx01/keymaps/via && \
+            find /workspace -name 'config.h' -exec cp {} /tmp/qmk_firmware/keyboards/kbhx01/ \; && \
+            find /workspace -name 'info.json' -exec cp {} /tmp/qmk_firmware/keyboards/kbhx01/ \; && \
+            find /workspace -name 'rules.mk' -exec cp {} /tmp/qmk_firmware/keyboards/kbhx01/ \; && \
+            find /workspace -name 'keymap.c' -exec cp {} /tmp/qmk_firmware/keyboards/kbhx01/keymaps/via/ \; && \
+            cd /tmp/qmk_firmware && \
             qmk compile -kb kbhx01 -km via && \
             cp /tmp/qmk_firmware/*.uf2 /workspace/
           "
