@@ -15,7 +15,8 @@ jobs:
         run: |
           docker run --rm -v $(pwd):/workspace -w /workspace ghcr.io/qmk/qmk_cli:latest /bin/bash -c "
             qmk setup -y -H /tmp/qmk_firmware && \
-            cp -r /workspace/keyboards/kbhx01 /tmp/qmk_firmware/keyboards/ && \
+            mkdir -p /tmp/qmk_firmware/keyboards/kbhx01 && \
+            cp -r /workspace/config.h /workspace/info.json /workspace/rules.mk /workspace/keymaps /tmp/qmk_firmware/keyboards/kbhx01/ && \
             cd /tmp/qmk_firmware && \
             qmk compile -kb kbhx01 -km via && \
             cp /tmp/qmk_firmware/*.uf2 /workspace/
