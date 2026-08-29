@@ -14,9 +14,13 @@ jobs:
       - name: Compile QMK in Docker
         run: |
           docker run --rm -v $(pwd):/workspace -w /workspace ghcr.io/qmk/qmk_cli:latest /bin/bash -c "
+            git config --global --add safe.directory '*' && \
             qmk setup -y -H /tmp/qmk_firmware && \
-            mkdir -p /tmp/qmk_firmware/keyboards/kbhx01 && \
-            cp -r /workspace/config.h /workspace/info.json /workspace/rules.mk /workspace/keymaps /tmp/qmk_firmware/keyboards/kbhx01/ && \
+            mkdir -p /tmp/qmk_firmware/keyboards/kbhx01/keymaps/via && \
+            find /workspace -name 'config.h' -exec cp {} /tmp/qmk_firmware/keyboards/kbhx01/ \; && \
+            find /workspace -name 'info.json' -exec cp {} /tmp/qmk_firmware/keyboards/kbhx01/ \; && \
+            find /workspace -name 'rules.mk' -exec cp {} /tmp/qmk_firmware/keyboards/kbhx01/ \; && \
+            find /workspace -name 'keymap.c' -exec cp {} /tmp/qmk_firmware/keyboards/kbhx01/keymaps/via/ \; && \
             cd /tmp/qmk_firmware && \
             qmk compile -kb kbhx01 -km via && \
             cp /tmp/qmk_firmware/*.uf2 /workspace/
